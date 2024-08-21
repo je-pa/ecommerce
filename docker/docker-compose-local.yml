@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  app:
+    image: first-come # 스프링 부트 애플리케이션의 도커 이미지
+    container_name: first-serve-container
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ecommerce
+      SPRING_DATASOURCE_USERNAME: ecommerce
+      SPRING_DATASOURCE_PASSWORD: ecommerce312
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecommerce
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: ecommerce
+      MYSQL_PASSWORD: ecommerce312
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -uecommerce -pecommerce312" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    networks:
+      - ecommerce
+
+  redis:
+    image: redis:7.0
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    networks:
+      - ecommerce
+
+volumes:
+  db_data:
+
+networks:
+  ecommerce:
+    driver: bridge

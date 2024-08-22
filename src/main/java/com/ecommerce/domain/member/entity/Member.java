@@ -4,6 +4,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 import com.ecommerce.domain.BaseEntity;
 import com.ecommerce.domain.member.type.Role;
+import com.ecommerce.global.security.service.dto.Authenticatable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+public class Member extends BaseEntity implements Authenticatable {
   @Id
   @GeneratedValue(strategy = IDENTITY)
   @Column(name = "user_id")
@@ -54,5 +55,10 @@ public class Member extends BaseEntity {
     this.password = password;
     this.tellNumber = tellNumber;
     this.role = role;
+  }
+
+  @Override
+  public String getUsername() {
+    return this.email;
   }
 }

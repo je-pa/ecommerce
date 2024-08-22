@@ -2,12 +2,10 @@ package com.ecommerce.global.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import com.ecommerce.global.security.filter.LoginFilter;
 import com.ecommerce.global.security.handler.LoginFailureHandler;
 import com.ecommerce.global.security.handler.LoginSuccessHandler;
 import com.ecommerce.global.security.handler.ExceptionHandlingFilter;
 import com.ecommerce.global.security.jwt.filter.JwtAuthenticationFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
@@ -37,7 +34,6 @@ public class SecurityConfig {
   private final LoginFailureHandler loginFailureHandler;
   private final LoginSuccessHandler loginSuccessHandler;
   private final UserDetailsService userDetailsService;
-  private final ObjectMapper objectMapper;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -47,7 +43,13 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .formLogin(AbstractHttpConfigurer::disable)
+        .formLogin(form -> form
+            .loginPage("/api/auth/login")
+            .usernameParameter("email")
+            .passwordParameter("password")
+            .successHandler(loginSuccessHandler)
+            .failureHandler(loginFailureHandler)
+            .permitAll())
         .httpBasic(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(sessionManagement ->
@@ -57,19 +59,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/lectures/**").permitAll()
                 .anyRequest().authenticated())
         .addFilterBefore(this.authenticationFilter, LogoutFilter.class)
-        .addFilterBefore(this.exceptionHandlingFilter, JwtAuthenticationFilter.class)
-        .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(this.exceptionHandlingFilter, JwtAuthenticationFilter.class);
 
     return http.build();
-  }
-
-  @Bean
-  public LoginFilter loginFilter() {
-    LoginFilter loginFilter = new LoginFilter(authenticationManager(), objectMapper);
-    loginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
-    loginFilter.setAuthenticationFailureHandler(loginFailureHandler);
-
-    return loginFilter;
   }
 
   @Bean

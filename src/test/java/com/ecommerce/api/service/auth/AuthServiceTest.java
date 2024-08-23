@@ -183,9 +183,8 @@ class AuthServiceTest extends IntegrationTestSupport {
     String confirmPassword = "Password1!";
     String tellNumber = "01077777777";
     String address = "서울시 용산구 333";
-    SignupRequest signupRequest = new SignupRequest(
+    return new SignupRequest(
         name, email, password, confirmPassword, tellNumber, address, authCode);
-    return signupRequest;
   }
 
   private Member createMember(String email){

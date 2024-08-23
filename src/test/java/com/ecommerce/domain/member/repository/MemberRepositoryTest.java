@@ -46,7 +46,7 @@ class MemberRepositoryTest extends IntegrationTestSupport {
         .build();
 
     // when
-    Member save = memberRepository.save(member);
+    memberRepository.save(member);
 
     // then
     List<Member> all = memberRepository.findAll();

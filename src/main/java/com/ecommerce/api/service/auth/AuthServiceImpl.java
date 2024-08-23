@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
       throw CustomException.from(ExceptionCode.EMAIL_ALREADY_EXISTS);
     }
 
-    if (!emailAuthCodeRepository.hasKey(encryptedEmail)) {
+    if (!(boolean) emailAuthCodeRepository.hasKey(encryptedEmail)) {
       throw CustomException.from(ExceptionCode.EMAIL_AUTH_CODE_SAVE_FAILED);
     }
 

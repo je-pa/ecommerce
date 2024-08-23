@@ -6,6 +6,7 @@ package com.ecommerce.api.controller.auth;
 
 import com.ecommerce.api.controller.ApiResponse;
 import com.ecommerce.api.controller.auth.dto.request.MailRequest;
+import com.ecommerce.api.controller.auth.dto.request.SignupRequest;
 import com.ecommerce.api.service.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,4 +28,12 @@ public class AuthController {
       @RequestBody @Valid MailRequest mailRequestDto) {
     return ResponseEntity.ok(authService.sendAuthCode(mailRequestDto));
   }
+
+  @PostMapping("/signup")
+  public ResponseEntity<ApiResponse<String>> signup(
+      @RequestBody @Valid SignupRequest request
+  ){
+    return ResponseEntity.ok(authService.signup(request));
+  }
+
 }

@@ -1,5 +1,6 @@
 package com.ecommerce.global.exception;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -14,6 +15,9 @@ import org.springframework.http.HttpStatus;
 public enum ExceptionCode {
 
   // BAD_REQUEST:400:잘못된요청
+  PASSWORD_MISMATCH(BAD_REQUEST, "두 비밀번호가 일치하지 않습니다."),
+  VERIFICATION_CODE_MISMATCH(BAD_REQUEST, "인증코드가 일치하지 않습니다."),
+  CODE_EXPIRED_OR_INVALID(BAD_REQUEST, "인증 코드가 만료되었거나 존재하지 않습니다."),
 
   // Unauthorized:401:인증이슈
   INVALID_JWT_SIGNATURE(UNAUTHORIZED, "유효하지 않는 JWT 서명입니다."),

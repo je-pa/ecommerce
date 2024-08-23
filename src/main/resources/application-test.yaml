@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:~/ecommerce
+    driver-class-name: org.h2.Driver
+    username: ecommerce
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      host: localhost
+      port: 6379
+encoder:
+  algorithm: AES
+  secret-key: mysamplekey12345

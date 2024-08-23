@@ -6,12 +6,10 @@ package com.ecommerce.api.controller.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
 
-@Getter
-public class MailRequest {
-
-  @NotBlank(message = "이메일이 입력되지 않았습니다.")
-  @Email(message = "이메일 형식이 아닙니다.")
-  private String email;
+public record MailRequest (
+    @NotBlank(message = "이메일이 입력되지 않았습니다.")
+    @Email(message = "이메일 형식이 아닙니다.")
+    String email
+){
 }

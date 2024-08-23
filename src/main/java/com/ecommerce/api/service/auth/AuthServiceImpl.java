@@ -27,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public ApiResponse<String> sendAuthCode(MailRequest mailRequestDto) {
-    SendAuthCodeEmailEvent event = SendAuthCodeEmailEvent.from(mailRequestDto.getEmail());
+    SendAuthCodeEmailEvent event = SendAuthCodeEmailEvent.from(mailRequestDto.email());
 
     String encryptedEmail = myEncoder.encrypt(event.toEmail());
     emailAuthCodeRepository.setWithDurationByKey(encryptedEmail, event.authCode());

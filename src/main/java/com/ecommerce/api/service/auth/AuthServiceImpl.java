@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     String encryptedEmail = myEncoder.encrypt(event.toEmail());
     emailAuthCodeRepository.setWithDurationByKey(encryptedEmail, event.authCode());
 
-    if(memberRepository.existsByEmail(encryptedEmail)){
+    if (memberRepository.existsByEmail(encryptedEmail)) {
       throw CustomException.from(ExceptionCode.EMAIL_ALREADY_EXISTS);
     }
 
@@ -54,19 +54,19 @@ public class AuthServiceImpl implements AuthService {
   public ApiResponse<String> signup(SignupRequest request) {
     String encryptedEmail = myEncoder.encrypt(request.email());
 
-    if(!request.password().equals(request.confirmPassword())){
+    if (!request.password().equals(request.confirmPassword())) {
       throw CustomException.from(ExceptionCode.PASSWORD_MISMATCH);
     }
 
-    if(memberRepository.existsByEmail(encryptedEmail)){
+    if (memberRepository.existsByEmail(encryptedEmail)) {
       throw CustomException.from(ExceptionCode.EMAIL_ALREADY_EXISTS);
     }
 
-    if(!emailAuthCodeRepository.hasKey(encryptedEmail)){
+    if (!(boolean) emailAuthCodeRepository.hasKey(encryptedEmail)) {
       throw CustomException.from(ExceptionCode.CODE_EXPIRED_OR_INVALID);
     }
 
-    if(!emailAuthCodeRepository.getByKey(encryptedEmail).equals(request.authCode())){
+    if (!emailAuthCodeRepository.getByKey(encryptedEmail).equals(request.authCode())) {
       throw CustomException.from(ExceptionCode.VERIFICATION_CODE_MISMATCH);
     }
 

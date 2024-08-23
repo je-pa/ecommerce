@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     eventPublisher.publishEvent(event);
-    String message = "인증코드를 이메일로 전송하였습니다.";
+    String message = "인증코드를 이메일로 전송하였습니다. 인증코드의 유효시간은 1분입니다.";
     return ApiResponse.ok(message);
   }
 }

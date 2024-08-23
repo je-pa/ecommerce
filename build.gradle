@@ -50,6 +50,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+    // queryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 }
 
 tasks.named('test') {
@@ -114,4 +120,15 @@ sonar {
         property 'sonar.java.coveragePlugin', 'jacoco'
         property 'sonar.coverage.jacoco.xmlReportPaths', "build/reports/jacoco/index.xml"
     }
+}
+
+// querydsl
+def querydslDir = 'src/main/generated'
+
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+clean {
+    delete file(querydslDir)
 }

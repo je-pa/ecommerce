@@ -5,12 +5,14 @@
 package com.ecommerce.api.controller.product;
 
 import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest;
+import com.ecommerce.api.controller.product.dto.response.ProductDetailResponse;
 import com.ecommerce.api.controller.product.dto.response.ProductListItemResponse;
 import com.ecommerce.api.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProductController {
   private final ProductService productService;
+
+  @GetMapping("/{productId}")
+  public ResponseEntity<ProductDetailResponse> getProductSlice(@PathVariable Long productId) {
+    return ResponseEntity.ok(
+        productService.get(productId)
+    );
+  }
 
   @GetMapping
   public ResponseEntity<Slice<ProductListItemResponse>> getProductSlice(

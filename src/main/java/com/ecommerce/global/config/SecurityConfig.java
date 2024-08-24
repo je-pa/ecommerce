@@ -66,7 +66,7 @@ public class SecurityConfig {
             authorizeRequests.requestMatchers("/api/auth/signup",
                     "/api/auth/send-email-auth-code",
                     "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .anyRequest().authenticated())
         .addFilterBefore(this.authenticationFilter, LogoutFilter.class)
         .addFilterBefore(this.exceptionHandlingFilter, JwtAuthenticationFilter.class);

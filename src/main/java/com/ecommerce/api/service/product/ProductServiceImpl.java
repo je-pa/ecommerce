@@ -5,6 +5,7 @@
 package com.ecommerce.api.service.product;
 
 import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest;
+import com.ecommerce.api.controller.product.dto.response.ProductDetailResponse;
 import com.ecommerce.api.controller.product.dto.response.ProductListItemResponse;
 import com.ecommerce.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,11 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
 
   private final ProductRepository productRepository;
+
+  @Override
+  public ProductDetailResponse get(Long productId) {
+    return ProductDetailResponse.from(productRepository.find(productId));
+  }
 
   @Override
   public Slice<ProductListItemResponse> getProductSlice(ReadProductListRequest request) {

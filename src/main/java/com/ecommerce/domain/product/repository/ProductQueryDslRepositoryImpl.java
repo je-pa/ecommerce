@@ -5,6 +5,7 @@
 package com.ecommerce.domain.product.repository;
 
 import static com.ecommerce.domain.product.entity.QProduct.product;
+import static com.ecommerce.domain.product.entity.QProductOption.productOption;
 import static com.ecommerce.domain.store.entity.QStore.store;
 
 import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest;
@@ -12,6 +13,10 @@ import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest.R
 import com.ecommerce.api.controller.product.dto.response.ProductListItemResponse;
 import com.ecommerce.api.controller.product.dto.response.QProductListItemResponse;
 import com.ecommerce.api.controller.product.dto.response.QProductListItemResponse_StoreInfo;
+import com.ecommerce.domain.product.repository.dao.ProductDetailDao;
+import com.ecommerce.domain.product.repository.dao.QProductDetailDao;
+import com.ecommerce.domain.product.repository.dao.QProductDetailDao_ProductOptionInfo;
+import com.ecommerce.domain.product.repository.dao.QProductDetailDao_StoreInfo;
 import com.ecommerce.domain.product.type.ProductCategory;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -27,6 +32,36 @@ import org.springframework.stereotype.Repository;
 public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository {
 
   private final JPAQueryFactory queryFactory;
+
+  @Override
+  public List<ProductDetailDao> find(Long productId) {
+    return queryFactory
+        .select(new QProductDetailDao(
+            product.id,
+            product.name,
+            new QProductDetailDao_StoreInfo(
+                store.id,
+                store.name
+            ),
+            product.stockQuantity,
+            product.category,
+            product.thumbnailImgUrl,
+            product.price,
+            product.createdDateTime,
+            new QProductDetailDao_ProductOptionInfo(
+                productOption.id,
+                productOption.name,
+                productOption.count,
+                productOption.price,
+                productOption.optionType
+            )
+        ))
+        .from(product)
+        .innerJoin(product.store, store)
+        .innerJoin(productOption).on(productOption.product.eq(product))
+        .where(product.id.eq(productId))
+        .fetch();
+  }
 
   @Override
   public Slice<ProductListItemResponse> findListBy(ReadProductListRequest request) {

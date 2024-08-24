@@ -50,14 +50,18 @@ public class Product extends BaseEntity {
   @Column(name = "thumbnail_img_url")
   private String thumbnailImgUrl;
 
+  @Column(name = "price", nullable = false)
+  private int price;
+
   @Builder
   public Product(ProductCategory category, String info, String name, int stockQuantity, Store store,
-      String thumbnailImgUrl) {
+      String thumbnailImgUrl, int price) {
     this.category = category;
     this.info = info;
     this.name = name;
     this.stockQuantity = stockQuantity;
     this.store = store;
     this.thumbnailImgUrl = thumbnailImgUrl;
+    this.price = price;
   }
 }

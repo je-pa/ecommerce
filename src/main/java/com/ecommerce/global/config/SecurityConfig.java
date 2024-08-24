@@ -10,6 +10,7 @@ import com.ecommerce.global.security.jwt.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -65,6 +66,7 @@ public class SecurityConfig {
             authorizeRequests.requestMatchers("/api/auth/signup",
                     "/api/auth/send-email-auth-code",
                     "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                 .anyRequest().authenticated())
         .addFilterBefore(this.authenticationFilter, LogoutFilter.class)
         .addFilterBefore(this.exceptionHandlingFilter, JwtAuthenticationFilter.class);

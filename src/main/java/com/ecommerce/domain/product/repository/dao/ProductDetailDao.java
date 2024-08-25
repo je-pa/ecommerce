@@ -23,7 +23,7 @@ public record ProductDetailDao(
 
   @QueryProjection
   public ProductDetailDao {
-
+    // QueryProjection 을 위한 생성자
   }
 
   public record StoreInfo(
@@ -33,7 +33,7 @@ public record ProductDetailDao(
 
     @QueryProjection
     public StoreInfo {
-
+      // QueryProjection 을 위한 생성자
     }
   }
 
@@ -45,6 +45,8 @@ public record ProductDetailDao(
       OptionType optionType
   ){
     @QueryProjection
-    public ProductOptionInfo {}
+    public ProductOptionInfo {
+      // QueryProjection 을 위한 생성자
+    }
   }
 }

@@ -87,7 +87,7 @@ public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository 
             equalsCategory(request.productCategory())
         )
         .orderBy(sort(request.listSort()))
-        .offset(request.pageNumber() * request.pageSize())
+        .offset((int)request.pageNumber() * request.pageSize())
         .limit(request.pageSize() + 1)
         .fetch();
 
@@ -122,16 +122,14 @@ public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository 
             product.price.asc(),
             product.id.desc()
         };
-      case CREATED_DATE_DESC:
-        return new OrderSpecifier[]{
-            product.id.desc()
-        };
       case CREATED_DATE_ASC:
         return new OrderSpecifier[]{
             product.id.asc()
         };
       default:
-        return null;
+        return new OrderSpecifier[]{
+            product.id.desc()
+        };
     }
   }
 

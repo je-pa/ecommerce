@@ -21,7 +21,7 @@ public record ProductListItemResponse(
 
   @QueryProjection
   public ProductListItemResponse {
-
+    // QueryProjection 을 위한 생성자
   }
 
   public record StoreInfo(
@@ -31,7 +31,7 @@ public record ProductListItemResponse(
 
     @QueryProjection
     public StoreInfo {
-
+      // QueryProjection 을 위한 생성자
     }
   }
 }

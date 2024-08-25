@@ -20,7 +20,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductDetailResponse get(Long productId) {
-    return ProductDetailResponse.from(productRepository.find(productId));
+    return ProductDetailResponse.from(productRepository.findWithOptions(productId));
   }
 
   @Override

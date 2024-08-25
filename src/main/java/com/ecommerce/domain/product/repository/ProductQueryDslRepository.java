@@ -12,7 +12,7 @@ import org.springframework.data.domain.Slice;
 
 public interface ProductQueryDslRepository {
 
-  List<ProductDetailDao> find(Long productId);
+  List<ProductDetailDao> findWithOptions(Long productId);
 
   Slice<ProductListItemResponse> findListBy(ReadProductListRequest request);
 }

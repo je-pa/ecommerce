@@ -34,7 +34,7 @@ public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository 
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public List<ProductDetailDao> find(Long productId) {
+  public List<ProductDetailDao> findWithOptions(Long productId) {
     return queryFactory
         .select(new QProductDetailDao(
             product.id,

@@ -75,6 +75,7 @@ def excludePatterns = [
         "**/exception/**",
         "**/mail/**",
         "**/dto/**",
+        "**/dao/**",
         "**/*Filter*",
         "**/*Handler*",
         "**/security/**",

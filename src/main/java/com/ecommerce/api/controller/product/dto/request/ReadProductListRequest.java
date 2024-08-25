@@ -5,6 +5,7 @@
 package com.ecommerce.api.controller.product.dto.request;
 
 import com.ecommerce.domain.product.type.ProductCategory;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 
+@Builder
 public record ReadProductListRequest(
 
     Long storeId,

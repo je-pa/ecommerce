@@ -105,7 +105,7 @@ public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository 
             likeSearchKeyword(request.searchKeyword()),
             equalsCategory(request.productCategory())
         )
-        .stream().count();
+        .fetch().size();
 
     return new PageImpl<>(list, request.getPageable(), total);
   }

@@ -22,6 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
   private final ProductService productService;
 
+  /**
+   * 상품의 상세 정보를 조회합니다.
+   * @param productId 조회할 상품의 id
+   * @return 상품 상세 정보
+   */
   @GetMapping("/{productId}")
   public ResponseEntity<ProductDetailResponse> getProduct(@PathVariable Long productId) {
     return ResponseEntity.ok(
@@ -29,6 +34,11 @@ public class ProductController {
     );
   }
 
+  /**
+   * 상품의 리스트를 필터링하여 조회합니다.
+   * @param request 상품 필터링 정보
+   * @return 페이징 기반 상품 리스트
+   */
   @GetMapping
   public ResponseEntity<Slice<ProductListItemResponse>> getProductSlice(
     ReadProductListRequest request

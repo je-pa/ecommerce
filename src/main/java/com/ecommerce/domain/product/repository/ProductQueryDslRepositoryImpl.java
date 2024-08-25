@@ -87,8 +87,8 @@ public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository 
             equalsCategory(request.productCategory())
         )
         .orderBy(sort(request.listSort()))
-        .offset((int)request.pageNumber() * request.pageSize())
-        .limit(request.pageSize() + 1)
+        .offset((long)request.pageNumber() * request.pageSize())
+        .limit((long)request.pageSize() + 1)
         .fetch();
 
     boolean hasNext = list.size() > request.pageSize();
@@ -105,7 +105,7 @@ public class ProductQueryDslRepositoryImpl implements ProductQueryDslRepository 
             likeSearchKeyword(request.searchKeyword()),
             equalsCategory(request.productCategory())
         )
-        .fetchCount();
+        .stream().count();
 
     return new PageImpl<>(list, request.getPageable(), total);
   }

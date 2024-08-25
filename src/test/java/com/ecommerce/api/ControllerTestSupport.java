@@ -1,7 +1,9 @@
 package com.ecommerce.api;
 
 import com.ecommerce.api.controller.auth.AuthController;
+import com.ecommerce.api.controller.product.ProductController;
 import com.ecommerce.api.service.auth.AuthService;
+import com.ecommerce.api.service.product.ProductService;
 import com.ecommerce.global.security.jwt.util.TokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = {
-    AuthController.class
+    AuthController.class,
+    ProductController.class
 })
 @ActiveProfiles("test")
 public abstract class ControllerTestSupport {
@@ -22,9 +25,12 @@ public abstract class ControllerTestSupport {
   protected ObjectMapper objectMapper;
 
   @MockBean
+  protected TokenProvider tokenProvider;
+
+  @MockBean
   protected AuthService authService;
 
   @MockBean
-  protected TokenProvider tokenProvider;
+  protected ProductService productService;
 
 }

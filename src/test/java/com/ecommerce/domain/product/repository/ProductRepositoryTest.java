@@ -20,8 +20,13 @@ import com.ecommerce.domain.store.entity.Store;
 import com.ecommerce.domain.store.repository.StoreRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,8 +93,9 @@ class ProductRepositoryTest extends IntegrationTestSupport {
   }
 
   @DisplayName("상품 리스트를 조회한다.")
-  @Test
-  void findListBy() {
+  @MethodSource("filterProducts")
+  @ParameterizedTest(name = "[{index}] {0}")
+  void findListBy(ReadProductListSort sort, Tuple[] tuples) {
     // given
     String storeName1 = "가게명 1";
     Store store1 = storeRepository.save(createStore(storeName1));
@@ -104,8 +110,8 @@ class ProductRepositoryTest extends IntegrationTestSupport {
     list.add(createProduct("상", 13, ProductCategory.ACCESSORY, store1, 5000));
     list.add(createProduct("상품5", 5, ProductCategory.ACCESSORY, store1, 6000));
     list.add(createProduct("상품6", 15, ProductCategory.ACCESSORY, store1, 7000));
-    list.add(createProduct("상품7", 5, ProductCategory.ACCESSORY, store1, 8000));
-    list.add(createProduct("상품8", 15, ProductCategory.ACCESSORY, store1, 9000));
+    list.add(createProduct("상품7", 5, ProductCategory.ACCESSORY, store1, 9000));
+    list.add(createProduct("상품8", 15, ProductCategory.ACCESSORY, store1, 8000));
     list.add(createProduct("상품9", 10, ProductCategory.TOP, store2, 10000));
     list.add(createProduct("상품10", 16, ProductCategory.TOP, store2, 11000));
     list.add(createProduct("상품11", 11, ProductCategory.ACCESSORY, store2, 12000));
@@ -120,7 +126,7 @@ class ProductRepositoryTest extends IntegrationTestSupport {
             .searchKeyword("상품")
             .productCategory(ProductCategory.ACCESSORY)
             .pageSize(3)
-            .listSort(ReadProductListSort.PRICE_DESC)
+            .listSort(sort)
             .pageNumber(2)
             .build());
 
@@ -128,10 +134,76 @@ class ProductRepositoryTest extends IntegrationTestSupport {
     assertThat(result).hasSize(2)
         .extracting("name", "store.name", "quantity", "category")
         .containsExactly(
-            tuple("상품5", storeName1, 5, ProductCategory.ACCESSORY),
-            tuple("상품4", storeName1, 13, ProductCategory.ACCESSORY)
+            tuples
         );
+  }
 
+  @DisplayName("상품 리스트를 조회한다. - 필터 항목은 필수가 아니다.")
+  @Test
+  void findListByWithNullFilter() {
+    // given
+    String storeName1 = "가게명 1";
+    Store store1 = storeRepository.save(createStore(storeName1));
+    String storeName2 = "가게명 2";
+    Store store2 = storeRepository.save(createStore(storeName2));
+
+    List<Product> list = new ArrayList<>();
+    list.add(createProduct("상품1", 8, ProductCategory.TOP, store1, 1000));
+    list.add(createProduct("상품2", 13, ProductCategory.TOP, store1, 2000));
+    list.add(createProduct("상품3", 8, ProductCategory.TOP, store1, 3000));
+    list.add(createProduct("상품4", 13, ProductCategory.ACCESSORY, store1, 4000));
+    list.add(createProduct("상", 13, ProductCategory.ACCESSORY, store1, 5000));
+    list.add(createProduct("상품5", 5, ProductCategory.ACCESSORY, store1, 6000));
+    list.add(createProduct("상품6", 15, ProductCategory.ACCESSORY, store1, 7000));
+    list.add(createProduct("상품7", 5, ProductCategory.ACCESSORY, store1, 9000));
+    list.add(createProduct("상품8", 15, ProductCategory.ACCESSORY, store1, 8000));
+    list.add(createProduct("상품9", 10, ProductCategory.TOP, store2, 10000));
+    list.add(createProduct("상품10", 16, ProductCategory.TOP, store2, 11000));
+    list.add(createProduct("상품11", 11, ProductCategory.ACCESSORY, store2, 12000));
+    list.add(createProduct("상품12", 17, ProductCategory.ACCESSORY, store2, 13000));
+
+    productRepository.saveAll(list);
+
+    // when
+    Slice<ProductListItemResponse> result = productRepository.findListBy(
+        ReadProductListRequest.builder()
+            .storeId(null)
+            .searchKeyword(null)
+            .productCategory(null)
+            .pageSize(3)
+            .listSort(null)
+            .pageNumber(null)
+            .build());
+
+    // then
+    assertThat(result).hasSize(3)
+        .extracting("name", "store.name", "category")
+        .containsExactly(
+            tuple("상품12", "가게명 2", ProductCategory.ACCESSORY),
+            tuple("상품11", "가게명 2", ProductCategory.ACCESSORY),
+            tuple("상품10", "가게명 2", ProductCategory.TOP)
+        );
+  }
+
+  private static Stream<Arguments> filterProducts() {
+    return Stream.of(
+      Arguments.of(ReadProductListSort.PRICE_DESC, new Tuple[]{
+          tuple("상품5", "가게명 1", 5, ProductCategory.ACCESSORY),
+          tuple("상품4", "가게명 1", 13, ProductCategory.ACCESSORY)
+      }),
+      Arguments.of(ReadProductListSort.PRICE_ASC, new Tuple[]{
+          tuple("상품8", "가게명 1", 15, ProductCategory.ACCESSORY),
+          tuple("상품7", "가게명 1", 5, ProductCategory.ACCESSORY)
+      }),
+        Arguments.of(ReadProductListSort.CREATED_DATE_DESC, new Tuple[]{
+          tuple("상품5", "가게명 1", 5, ProductCategory.ACCESSORY),
+          tuple("상품4", "가게명 1", 13, ProductCategory.ACCESSORY)
+      }),
+      Arguments.of(ReadProductListSort.CREATED_DATE_ASC, new Tuple[]{
+          tuple("상품7", "가게명 1", 5, ProductCategory.ACCESSORY),
+          tuple("상품8", "가게명 1", 15, ProductCategory.ACCESSORY)
+      })
+    );
   }
 
   private ProductOption createProductOption(String name, int quantity, Product product) {

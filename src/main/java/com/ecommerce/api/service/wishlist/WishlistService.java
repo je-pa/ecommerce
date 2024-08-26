@@ -7,6 +7,7 @@ package com.ecommerce.api.service.wishlist;
 import com.ecommerce.api.controller.ApiResponse;
 import com.ecommerce.api.controller.wishlist.dto.request.CreateWishlistRequest;
 import com.ecommerce.api.controller.wishlist.dto.response.WishlistWithItemsResponse;
+import com.ecommerce.api.service.wishlist.dto.request.UpdateWishlistItemQuantityRequestWithId;
 import java.util.List;
 
 public interface WishlistService {
@@ -15,4 +16,6 @@ public interface WishlistService {
 
 
   List<WishlistWithItemsResponse> readList(Long currentMemberId, Long memberId);
+
+  ApiResponse<String> updateItemQuantity(UpdateWishlistItemQuantityRequestWithId request);
 }

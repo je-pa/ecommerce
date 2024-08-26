@@ -36,6 +36,7 @@ public enum ExceptionCode {
   USER_NOT_FOUND(NOT_FOUND, "유저 개체를 찾지 못했습니다."),
   PRODUCT_OPTIONS_NOT_FOUND(NOT_FOUND, "없는 상품 옵션이 있습니다."),
   PRODUCT_OPTION_NOT_FOUND(NOT_FOUND, "상품 옵션 개체를 찾지 못했습니다."),
+  WISHLIST_ITEM_NOT_FOUND(NOT_FOUND, "위시리스트 항목 개체를 찾지 못했습니다."),
 
   // CONFLICT:409:충돌
   EMAIL_ALREADY_EXISTS(CONFLICT, "중복된 이메일 입니다."),

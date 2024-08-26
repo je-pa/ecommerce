@@ -7,6 +7,7 @@ package com.ecommerce.api.service.wishlist;
 import com.ecommerce.api.controller.ApiResponse;
 import com.ecommerce.api.controller.wishlist.dto.request.CreateWishlistRequest;
 import com.ecommerce.api.controller.wishlist.dto.response.WishlistWithItemsResponse;
+import com.ecommerce.api.service.wishlist.dto.request.UpdateWishlistItemQuantityRequestWithId;
 import com.ecommerce.domain.member.entity.Member;
 import com.ecommerce.domain.member.repository.MemberRepository;
 import com.ecommerce.domain.product.entity.Product;
@@ -130,5 +131,33 @@ public class WishlistServiceImpl implements WishlistService{
         wishlistRepository.findWishlistWithItemsDaoListBy(memberId));
   }
 
+  @Override
+  @Transactional
+  public ApiResponse<String> updateItemQuantity(UpdateWishlistItemQuantityRequestWithId request) {
+    WishlistItem wishlistItem = wishlistItemRepository.findWithWishlistById(request.itemId())
+        .orElseThrow(() -> CustomException.from(ExceptionCode.WISHLIST_ITEM_NOT_FOUND));
+
+    if(request.currentMemberId() != wishlistItem.getWishlist().getMember().getId()){
+      throw CustomException.from(ExceptionCode.UNAUTHORIZED_ACCESS);
+    }
+
+    switch (request.action()){
+      case DECREASE -> {
+        int quantity = wishlistItem.getQuantity();
+        if(quantity < 2){
+          Wishlist wishlist = wishlistItem.getWishlist();
+          if(wishlistItemRepository.countByWishlist(wishlist) == 1){
+            wishlistRepository.delete(wishlist);
+          }
+          wishlistItemRepository.delete(wishlistItem);
+        }else{
+          wishlistItem.addQuantity(-1);
+        }
+      }
+      case INCREASE -> wishlistItem.addQuantity(1);
+    }
+
+    return ApiResponse.ok("Wishlist updated successfully");
+  }
 
 }

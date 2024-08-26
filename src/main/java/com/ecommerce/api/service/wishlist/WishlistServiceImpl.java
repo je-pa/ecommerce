@@ -79,10 +79,7 @@ public class WishlistServiceImpl implements WishlistService{
           Product product = productOptions.getFirst().getProduct();
 
           // 새로운 Wishlist 생성
-          Wishlist newWishlist = Wishlist.builder()
-              .member(member)
-              .product(product)
-              .build();
+          Wishlist newWishlist = new Wishlist(member, product);
 
           // Wishlist 저장
           return wishlistRepository.save(newWishlist);
@@ -107,11 +104,7 @@ public class WishlistServiceImpl implements WishlistService{
         existingItem.addQuantity(request.quantity());
       } else {
         // 5-2. 매칭되는 WishlistItem이 없으면 새로 생성
-        WishlistItem newItem = WishlistItem.builder()
-            .wishlist(wishlist)
-            .option(option)
-            .quantity(request.quantity())
-            .build();
+        WishlistItem newItem = new WishlistItem(option, request.quantity(), wishlist);
         newItems.add(newItem);
       }
     }

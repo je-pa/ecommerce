@@ -155,6 +155,13 @@ public class WishlistServiceImpl implements WishlistService{
         }
       }
       case INCREASE -> wishlistItem.addQuantity(1);
+      case DELETE -> {
+        Wishlist wishlist = wishlistItem.getWishlist();
+        if(wishlistItemRepository.countByWishlist(wishlist) == 1){
+          wishlistRepository.delete(wishlist);
+        }
+        wishlistItemRepository.delete(wishlistItem);
+      }
     }
 
     return ApiResponse.ok("Wishlist updated successfully");

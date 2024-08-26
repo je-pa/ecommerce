@@ -2,6 +2,7 @@ package com.ecommerce.global.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -29,6 +30,7 @@ public enum ExceptionCode {
   PRODUCT_OPTION_DUPLICATE(UNAUTHORIZED, "중복된 상품 옵션이 있습니다."),
 
   // FORBIDDEN:403:권한이슈
+  UNAUTHORIZED_ACCESS(FORBIDDEN, "해당 정보를 조회할 수 있는 권한이 없습니다"),
 
   // NOT_FOUND:404:자원없음
   USER_NOT_FOUND(NOT_FOUND, "유저 개체를 찾지 못했습니다."),

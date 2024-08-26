@@ -1,7 +1,12 @@
+/**
+ * @Date : 2024. 08. 26.
+ * @author : jieun(je-pa)
+ */
 package com.ecommerce.api.service.wishlist;
 
 import com.ecommerce.api.controller.ApiResponse;
 import com.ecommerce.api.controller.wishlist.dto.request.CreateWishlistRequest;
+import com.ecommerce.api.controller.wishlist.dto.response.WishlistWithItemsResponse;
 import com.ecommerce.domain.member.entity.Member;
 import com.ecommerce.domain.member.repository.MemberRepository;
 import com.ecommerce.domain.product.entity.Product;
@@ -114,6 +119,15 @@ public class WishlistServiceImpl implements WishlistService{
     }
 
     return ApiResponse.ok("Wishlist updated successfully");
+  }
+
+  @Override
+  public List<WishlistWithItemsResponse> readList(Long currentMemberId, Long memberId) {
+    if(currentMemberId != memberId){
+      throw CustomException.from(ExceptionCode.UNAUTHORIZED_ACCESS);
+    }
+    return WishlistWithItemsResponse.toListFrom(
+        wishlistRepository.findWishlistWithItemsDaoListBy(memberId));
   }
 
 

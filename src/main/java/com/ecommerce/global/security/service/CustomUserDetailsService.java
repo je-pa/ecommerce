@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   }
 
   private UserDetailsDto getUserDetailsDomain(String username) {
-    return UserDetailsDto.from(memberRepository.findByEmail(username)
+    return UserDetailsDto.from(memberRepository.findByEmail(myEncoder.encrypt(username))
         .orElseThrow(() -> new UsernameNotFoundException(
             USER_NOT_FOUND.getMessage()
         )));

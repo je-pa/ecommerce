@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,15 @@ public class WishlistItem extends BaseEntity {
 
   @Column(name = "quantity")
   private int quantity;
+
+  @Builder
+  public WishlistItem(ProductOption option, int quantity, Wishlist wishlist) {
+    this.option = option;
+    this.quantity = quantity;
+    this.wishlist = wishlist;
+  }
+
+  public void addQuantity(int add){
+    this.quantity += add;
+  }
 }

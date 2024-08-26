@@ -4,6 +4,7 @@ import static io.jsonwebtoken.Jwts.SIG;
 
 import com.ecommerce.global.exception.CustomException;
 import com.ecommerce.global.exception.ExceptionCode;
+import com.ecommerce.global.security.util.MyEncoder;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -36,16 +37,19 @@ public class TokenProvider {
   private static final long TOKEN_EXPIRE_TIME = 3_600_000L; // 1000 * 60 * 60 // 1hour
   private static final String KEY_ROLES = "roles";
   private static final MacAlgorithm SIGNATURE_ALGORITHM = SIG.HS256;
+  private static final String MEMBER_ID_KEY = "memberId";
   public static final String TOKEN_PREFIX = "Bearer ";
 
+
   private final UserDetailsService userDetailsService;
+  private final MyEncoder myEncoder;
 
   private SecretKey key;
   @Value("${spring.jwt.secret}")
   private String secretKey;
 
-  public String generateToken(String username, Collection<? extends GrantedAuthority> roles) {
-    Claims claims = Jwts.claims().subject(username).add(KEY_ROLES, roles).build();
+  public String generateToken(Long memberId, String username, Collection<? extends GrantedAuthority> roles) {
+    Claims claims = Jwts.claims().subject(username).add(MEMBER_ID_KEY, memberId).add(KEY_ROLES, roles).build();
 
     Date now = new Date();
     Date expiredDate = new Date(now.getTime() + TOKEN_EXPIRE_TIME);
@@ -63,7 +67,8 @@ public class TokenProvider {
       return null;
     }
     token = token.substring(TOKEN_PREFIX.length());
-    UserDetails userDetails = this.userDetailsService.loadUserByUsername(this.getUsername(token));
+    UserDetails userDetails = this.userDetailsService.loadUserByUsername(
+        myEncoder.decrypt(this.getUsername(token)));
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 

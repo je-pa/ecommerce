@@ -123,6 +123,7 @@ public class WishlistServiceImpl implements WishlistService{
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<WishlistWithItemsResponse> readList(Long currentMemberId, Long memberId) {
     if(!currentMemberId.equals(memberId)){
       throw CustomException.from(ExceptionCode.UNAUTHORIZED_ACCESS);

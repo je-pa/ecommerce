@@ -51,7 +51,7 @@ public record WishlistWithItemsResponse(
           List<WishlistWithItemsDao> groupedDaos = entry.getValue();
 
           // 각 그룹에서 첫 번째 항목을 사용해 WishlistWithItemsResponse를 생성하고
-          WishlistWithItemsDao firstDao = groupedDaos.get(0);
+          WishlistWithItemsDao firstDao = groupedDaos.getFirst();
 
           // items는 그룹화된 목록에서 생성
           List<WishlistWithItemsResponse.Item> items = groupedDaos.stream()

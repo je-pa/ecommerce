@@ -70,13 +70,13 @@ public class WishlistServiceImpl implements WishlistService{
 
     // 4. Member 및 Product에 해당하는 wishlist가 있으면 조회 없으면 생성
     Wishlist wishlist = wishlistRepository.findByMemberIdAndProductId(
-            memberId, productOptions.get(0).getProduct().getId())
+            memberId, productOptions.getFirst().getProduct().getId())
         .orElseGet(() -> {
           // Member 및 Product 조회
           Member member = memberRepository.findById(memberId)
               .orElseThrow(() -> CustomException.from(ExceptionCode.USER_NOT_FOUND));
 
-          Product product = productOptions.get(0).getProduct();
+          Product product = productOptions.getFirst().getProduct();
 
           // 새로운 Wishlist 생성
           Wishlist newWishlist = Wishlist.builder()
@@ -124,7 +124,7 @@ public class WishlistServiceImpl implements WishlistService{
 
   @Override
   public List<WishlistWithItemsResponse> readList(Long currentMemberId, Long memberId) {
-    if(currentMemberId != memberId){
+    if(!currentMemberId.equals(memberId)){
       throw CustomException.from(ExceptionCode.UNAUTHORIZED_ACCESS);
     }
     return WishlistWithItemsResponse.toListFrom(
@@ -137,7 +137,7 @@ public class WishlistServiceImpl implements WishlistService{
     WishlistItem wishlistItem = wishlistItemRepository.findWithWishlistById(request.itemId())
         .orElseThrow(() -> CustomException.from(ExceptionCode.WISHLIST_ITEM_NOT_FOUND));
 
-    if(request.currentMemberId() != wishlistItem.getWishlist().getMember().getId()){
+    if(!request.currentMemberId().equals(wishlistItem.getWishlist().getMember().getId())){
       throw CustomException.from(ExceptionCode.UNAUTHORIZED_ACCESS);
     }
 

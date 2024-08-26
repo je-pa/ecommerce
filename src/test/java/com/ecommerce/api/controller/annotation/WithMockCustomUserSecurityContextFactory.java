@@ -1,4 +1,4 @@
-package com.ecommerce.api.controller;
+package com.ecommerce.api.controller.annotation;
 
 import com.ecommerce.domain.member.type.Role;
 import com.ecommerce.global.security.service.dto.CustomUserDetails;

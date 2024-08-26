@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.ecommerce.api.ControllerTestSupport;
-import com.ecommerce.api.controller.WithMockCustomUser;
+import com.ecommerce.api.controller.annotation.WithMockCustomUser;
 import com.ecommerce.api.controller.wishlist.dto.request.Action;
 import com.ecommerce.api.controller.wishlist.dto.request.CreateWishlistRequest;
 import com.ecommerce.api.controller.wishlist.dto.request.UpdateWishlistItemQuantityRequest;

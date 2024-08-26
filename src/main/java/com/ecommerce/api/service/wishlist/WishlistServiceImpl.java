@@ -148,9 +148,11 @@ public class WishlistServiceImpl implements WishlistService{
         if(quantity < 2){
           Wishlist wishlist = wishlistItem.getWishlist();
           if(wishlistItemRepository.countByWishlist(wishlist) == 1){
+            wishlistItemRepository.delete(wishlistItem);
             wishlistRepository.delete(wishlist);
+          }else{
+            wishlistItemRepository.delete(wishlistItem);
           }
-          wishlistItemRepository.delete(wishlistItem);
         }else{
           wishlistItem.addQuantity(-1);
         }
@@ -159,9 +161,11 @@ public class WishlistServiceImpl implements WishlistService{
       case DELETE -> {
         Wishlist wishlist = wishlistItem.getWishlist();
         if(wishlistItemRepository.countByWishlist(wishlist) == 1){
+          wishlistItemRepository.delete(wishlistItem);
           wishlistRepository.delete(wishlist);
+        }else{
+          wishlistItemRepository.delete(wishlistItem);
         }
-        wishlistItemRepository.delete(wishlistItem);
       }
     }
 

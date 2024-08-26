@@ -31,6 +31,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -365,8 +367,9 @@ class WishlistServiceTest extends IntegrationTestSupport {
   }
 
   @DisplayName("위시리스트 항목을 수정한다.")
-  @Test
-  void updateItemQuantity(){
+  @CsvSource({"INCREASE","DECREASE","DELETE"})
+  @ParameterizedTest
+  void updateItemQuantity(Action action){
     // given
     Product product1 = productRepository.save(createProduct("상품1"));
     Member member1 = memberRepository.save(createMember("email1@email.com"));
@@ -377,7 +380,7 @@ class WishlistServiceTest extends IntegrationTestSupport {
     // when
     ApiResponse<String> result = wishlistService.updateItemQuantity(
         UpdateWishlistItemQuantityRequestWithId.builder()
-            .action(Action.DECREASE)
+            .action(action)
             .itemId(item.getId())
             .currentMemberId(member1.getId())
             .build()

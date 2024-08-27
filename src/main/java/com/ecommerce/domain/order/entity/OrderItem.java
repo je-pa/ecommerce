@@ -34,8 +34,11 @@ public class OrderItem {
   @JoinColumn(name = "option_id", nullable = false)
   private ProductOption option;
 
-  @Column(name = "quantity")
+  @Column(name = "quantity", nullable = false)
   private int quantity;
+
+  @Column(name = "price", nullable = false)
+  private int price;
 
   @Builder
   public OrderItem(ProductOption option, Order order, int quantity) {

@@ -19,6 +19,7 @@ import com.ecommerce.domain.wishlist.entity.Wishlist;
 import com.ecommerce.domain.wishlist.entity.WishlistItem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +126,39 @@ class WishlistItemRepositoryTest extends IntegrationTestSupport {
 
     // then
     assertThat(count).isEqualTo(3);
+  }
+
+  @DisplayName("id를 Collection으로 받아서 in절로 WishlistItem을 조회합니다.")
+  @Test
+  void findAllByIdIn(){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+    Product product2 = productRepository.save(createProduct("상품2"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+
+    Wishlist wishlist1 = wishlistRepository.save(createWishlist(member1, product1));
+    Wishlist wishlist2 = wishlistRepository.save(createWishlist(member1, product2));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+    ProductOption option3 = productOptionRepository.save(createProductOption("옵션2-1", product2));
+
+    WishlistItem item1 = wishlistItemRepository.save(createWishlistItem(wishlist1, option1)); // 상품1, 옵션1-1
+    WishlistItem item2 = wishlistItemRepository.save(createWishlistItem(wishlist2, option2)); // 상품1, 옵션1-2
+    WishlistItem item3 = wishlistItemRepository.save(createWishlistItem(wishlist2, option3)); // 상품2, 옵션2-1
+
+    // when
+    List<WishlistItem> result = wishlistItemRepository.findAllByIdIn(
+        Set.of(item1.getId(), item3.getId())
+    );
+    // then
+    assertThat(result).hasSize(2)
+        .extracting("wishlist.product.name", "option.name")
+        .containsExactly(
+            tuple("상품1","옵션1-1"),
+            tuple("상품2","옵션2-1")
+        );
   }
 
   @DisplayName("id로 위시리스트 아이템을 조회한다.")

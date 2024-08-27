@@ -21,13 +21,14 @@ public enum ExceptionCode {
   CODE_EXPIRED_OR_INVALID(BAD_REQUEST, "인증 코드가 만료되었거나 존재하지 않습니다."),
   WISHLIST_OPTIONS_SAME_PRODUCT_ONLY(BAD_REQUEST, "모든 옵션의 상품이 같아야 합니다."),
   REQUESTS_EMPTY(BAD_REQUEST, "필수 요청 파라미터가 비었습니다."),
+  PRODUCT_OPTION_DUPLICATE(BAD_REQUEST, "중복된 상품 옵션이 있습니다."),
+  WISHLIST_ITEM_DUPLICATE(BAD_REQUEST, "중복된 상품 옵션이 있습니다."),
 
   // Unauthorized:401:인증이슈
   INVALID_JWT_SIGNATURE(UNAUTHORIZED, "유효하지 않는 JWT 서명입니다."),
   EXPIRED_JWT_TOKEN(UNAUTHORIZED, "만료된 JWT token 입니다."),
   UNSUPPORTED_JWT_TOKEN(UNAUTHORIZED, "지원되지 않는 JWT 토큰입니다."),
   JWT_CLAIMS_EMPTY(UNAUTHORIZED, "잘못된 JWT 토큰입니다."),
-  PRODUCT_OPTION_DUPLICATE(UNAUTHORIZED, "중복된 상품 옵션이 있습니다."),
 
   // FORBIDDEN:403:권한이슈
   UNAUTHORIZED_ACCESS(FORBIDDEN, "해당 정보를 조회할 수 있는 권한이 없습니다"),

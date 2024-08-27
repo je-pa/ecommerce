@@ -41,9 +41,10 @@ public class OrderItem {
   private int price;
 
   @Builder
-  public OrderItem(ProductOption option, Order order, int quantity) {
+  public OrderItem(ProductOption option, Order order, int quantity, int price) {
     this.option = option;
     this.order = order;
     this.quantity = quantity;
+    this.price = price;
   }
 }

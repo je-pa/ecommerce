@@ -5,6 +5,7 @@
 package com.ecommerce.api.service.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.ecommerce.IntegrationTestSupport;
@@ -12,6 +13,8 @@ import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest;
 import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest.ReadProductListSort;
 import com.ecommerce.api.controller.product.dto.response.ProductDetailResponse;
 import com.ecommerce.api.controller.product.dto.response.ProductListItemResponse;
+import com.ecommerce.api.service.product.event.UpdateQuantityByProductOptionsEvent;
+import com.ecommerce.api.service.product.event.UpdateQuantityByProductOptionsEvent.ProductOptionInfo;
 import com.ecommerce.domain.product.entity.Product;
 import com.ecommerce.domain.product.entity.ProductOption;
 import com.ecommerce.domain.product.repository.ProductOptionRepository;
@@ -20,8 +23,10 @@ import com.ecommerce.domain.product.type.OptionType;
 import com.ecommerce.domain.product.type.ProductCategory;
 import com.ecommerce.domain.store.entity.Store;
 import com.ecommerce.domain.store.repository.StoreRepository;
+import com.ecommerce.global.exception.CustomException;
 import java.util.ArrayList;
 import java.util.List;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -145,6 +150,119 @@ class ProductServiceTest extends IntegrationTestSupport {
 
   }
 
+  @DisplayName("상품 옵션 재고를 조정한다.")
+  @Test
+  void adjustQuantity(){
+    // given
+    Store store1 = storeRepository.save(createStore("storeName1"));
+
+    int option1Quantity = 5;
+    int option2Quantity = 7;
+    int option3Quantity = 9;
+    int totalCount = option1Quantity + option2Quantity + option3Quantity;
+    Product product1 = productRepository.save(
+        createProduct("상품1", store1, totalCount));
+
+    ProductOption option1 = productOptionRepository.save(
+        createProductOption("옵션1-1", option1Quantity, product1));
+    ProductOption option2 = productOptionRepository.save(
+        createProductOption("옵션1-2", option2Quantity, product1));
+    ProductOption option3 = productOptionRepository.save(
+        createProductOption("옵션1-3", option3Quantity, product1));
+
+    // when
+    productService.adjustQuantity(new UpdateQuantityByProductOptionsEvent(List.of(
+        new Info(option1.getId(), 2),
+        new Info(option2.getId(), 1)
+    )));
+
+    // then
+    assertThat(productOptionRepository.findAll())
+        .extracting("name", "count")
+        .containsExactlyInAnyOrder(
+            AssertionsForClassTypes.tuple("옵션1-1", 7),
+            AssertionsForClassTypes.tuple("옵션1-2", 8),
+            AssertionsForClassTypes.tuple("옵션1-3", option3Quantity)
+        );
+    assertThat(productRepository.findById(product1.getId()).get())
+        .extracting("name", "stockQuantity")
+        .contains("상품1", option1Quantity + 2 + option2Quantity + 1 + option3.getCount());
+
+  }
+
+  @DisplayName("상품 옵션id가 중복이면 안된다.")
+  @Test
+  void adjustQuantityWithProductOptionDuplicate(){
+    // given
+    Store store1 = storeRepository.save(createStore("storeName1"));
+
+    int option1Quantity = 5;
+    int option2Quantity = 7;
+    int option3Quantity = 9;
+    int totalCount = option1Quantity + option2Quantity + option3Quantity;
+    Product product1 = productRepository.save(
+        createProduct("상품1", store1, totalCount));
+
+    ProductOption option1 = productOptionRepository.save(
+        createProductOption("옵션1-1", option1Quantity, product1));
+    ProductOption option2 = productOptionRepository.save(
+        createProductOption("옵션1-2", option2Quantity, product1));
+    ProductOption option3 = productOptionRepository.save(
+        createProductOption("옵션1-3", option3Quantity, product1));
+
+    // when
+    // then
+    assertThatThrownBy(() ->productService.adjustQuantity(new UpdateQuantityByProductOptionsEvent(List.of(
+        new Info(option1.getId(), 2),
+        new Info(option1.getId(), 1)
+    )))).isInstanceOf(CustomException.class)
+        .hasMessage("중복된 상품 옵션이 있습니다.");
+
+  }
+
+  @DisplayName("재고가 모자르면 안된다.")
+  @Test
+  void adjustQuantityWithInsufficientStock(){
+    // given
+    Store store1 = storeRepository.save(createStore("storeName1"));
+
+    int option1Quantity = 0;
+    int option2Quantity = 7;
+    int option3Quantity = 9;
+    int totalCount = option1Quantity + option2Quantity + option3Quantity;
+    Product product1 = productRepository.save(
+        createProduct("상품1", store1, totalCount));
+
+    ProductOption option1 = productOptionRepository.save(
+        createProductOption("옵션1-1", option1Quantity, product1));
+    ProductOption option2 = productOptionRepository.save(
+        createProductOption("옵션1-2", option2Quantity, product1));
+    ProductOption option3 = productOptionRepository.save(
+        createProductOption("옵션1-3", option3Quantity, product1));
+
+    // when
+    // then
+    assertThatThrownBy(() ->productService.adjustQuantity(new UpdateQuantityByProductOptionsEvent(List.of(
+        new Info(option1.getId(), -2),
+        new Info(option2.getId(), -1)
+    )))).isInstanceOf(CustomException.class)
+        .hasMessage("재고가 충분하지 않습니다.");
+
+  }
+
+  record Info(Long productOptionId, int quantity)implements ProductOptionInfo {
+
+    @Override
+    public Long getProductOptionId() {
+      return this.productOptionId;
+    }
+
+    @Override
+    public int getQuantity() {
+      return this.quantity;
+    }
+  }
+
   private ProductOption createProductOption(String name, int quantity, Product product) {
     return ProductOption.builder()
         .product(product)
@@ -153,6 +271,10 @@ class ProductServiceTest extends IntegrationTestSupport {
         .optionType(OptionType.MANDATORY)
         .price(10000)
         .build();
+  }
+
+  private Product createProduct(String name, Store store, int quantity){
+    return createProduct(name, quantity, ProductCategory.TOP, store, 10000);
   }
 
   private Product createProduct(String name, int quantity, ProductCategory category, Store store, int price) {

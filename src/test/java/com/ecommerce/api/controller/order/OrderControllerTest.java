@@ -1,5 +1,6 @@
 package com.ecommerce.api.controller.order;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.ecommerce.api.ControllerTestSupport;
 import com.ecommerce.api.controller.annotation.WithMockCustomUser;
 import com.ecommerce.api.controller.order.dto.request.CreateOrderByWishlistItemsRequest;
+import com.ecommerce.api.controller.order.dto.request.OrderStatusRequest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,19 @@ class OrderControllerTest extends ControllerTestSupport {
     mockMvc.perform(
             post("/api/orders")
                 .content(objectMapper.writeValueAsString(requests))
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+        ).andDo(print())
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("주문 상태를 업데이트 한다.")
+  @Test
+  @WithMockCustomUser(memberId = 1L)
+  void setStatus() throws Exception {
+    mockMvc.perform(
+            patch("/api/orders/1/status")
+                .content(objectMapper.writeValueAsString(OrderStatusRequest.CANCEL))
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
         ).andDo(print())

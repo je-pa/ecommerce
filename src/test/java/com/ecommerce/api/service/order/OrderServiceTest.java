@@ -6,6 +6,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import com.ecommerce.IntegrationTestSupport;
 import com.ecommerce.api.controller.ApiResponse;
+import com.ecommerce.api.controller.order.dto.request.OrderStatusRequest;
 import com.ecommerce.api.service.order.dto.request.CreateOrderByWishlistItemsDto;
 import com.ecommerce.api.service.order.dto.request.CreateOrderByWishlistItemsDto.WishlistItemsDto;
 import com.ecommerce.domain.member.entity.Member;
@@ -33,6 +34,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -214,6 +217,203 @@ class OrderServiceTest extends IntegrationTestSupport {
             new WishlistItemsDto(item3.getId())),
         member2.getId()))).isInstanceOf(CustomException.class)
         .hasMessage("해당 정보를 조회할 수 있는 권한이 없습니다");
+  }
+
+  @DisplayName("주문을 취소한다.")
+  @Test
+  void updateStatusCancel(){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+    Product product2 = productRepository.save(createProduct("상품2"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+    Member member2 = memberRepository.save(createMember("email2@email.com"));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+    ProductOption option3 = productOptionRepository.save(createProductOption("옵션1-3", product1));
+
+    Order order = orderRepository.save(
+        createOrder(member1, OrderStatus.CREATED, option1.getPrice() + option2.getPrice()));
+    OrderItem orderItem1 = createOrderItem(order, option1, 1);
+    OrderItem orderItem2 = createOrderItem(order, option2, 2);
+    orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
+
+    // when
+    ApiResponse<String> result = orderService.updateStatus(member1.getId(),
+        order.getId(), OrderStatusRequest.CANCEL);
+
+    // then
+    assertThat(orderRepository.findById(order.getId()).get().getStatus()).isEqualTo(OrderStatus.CANCELLED);
+    assertThat(productOptionRepository.findAll())
+        .extracting("name", "count")
+        .containsExactlyInAnyOrder(
+            tuple("옵션1-1", 6),
+            tuple("옵션1-2", 7),
+            tuple("옵션1-3", 5)
+        );
+    assertThat(productRepository.findById(product1.getId()).get())
+        .extracting("name", "stockQuantity")
+        .contains("상품1", 6+7+option3.getCount());
+    assertThat(result)
+        .extracting("code", "status", "message", "data")
+        .contains(200, HttpStatus.OK, "OK", "상태가 업데이트 되었습니다.");
+  }
+
+  @DisplayName("주문을 반품 요청한다.")
+  @Test
+  void updateStatusRequestReturn(){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+    Product product2 = productRepository.save(createProduct("상품2"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+    Member member2 = memberRepository.save(createMember("email2@email.com"));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+    ProductOption option3 = productOptionRepository.save(createProductOption("옵션1-3", product1));
+
+    Order order = orderRepository.save(
+        createOrder(member1, OrderStatus.SHIPPED, option1.getPrice() + option2.getPrice()));
+    OrderItem orderItem1 = createOrderItem(order, option1, 1);
+    OrderItem orderItem2 = createOrderItem(order, option2, 2);
+    orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
+
+    // when
+    ApiResponse<String> result = orderService.updateStatus(member1.getId(),
+        order.getId(), OrderStatusRequest.REQUESTED_RETURN);
+
+    // then
+    assertThat(orderRepository.findById(order.getId()).get().getStatus()).isEqualTo(OrderStatus.REQUESTED_RETURN);
+    assertThat(productOptionRepository.findAll())
+        .extracting("name", "count")
+        .containsExactlyInAnyOrder(
+            tuple("옵션1-1", 5),
+            tuple("옵션1-2", 5),
+            tuple("옵션1-3", 5)
+        );
+    assertThat(result)
+        .extracting("code", "status", "message", "data")
+        .contains(200, HttpStatus.OK, "OK", "상태가 업데이트 되었습니다.");
+  }
+
+  @DisplayName("주문 정보가 없는 주문은 상태 업데이트가 불가능하다.")
+  @Test
+  void updateStatusWithOrderNotFound(){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+
+    Order order = orderRepository.save(
+        createOrder(member1, OrderStatus.CREATED, option1.getPrice() + option2.getPrice()));
+    OrderItem orderItem1 = createOrderItem(order, option1, 1);
+    OrderItem orderItem2 = createOrderItem(order, option2, 2);
+    orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
+
+    // when
+    // then
+    assertThatThrownBy(() ->orderService.updateStatus(member1.getId(),
+        order.getId() - 1, OrderStatusRequest.CANCEL)).isInstanceOf(CustomException.class)
+        .hasMessage("주문 개체를 찾지 못했습니다.");
+  }
+
+  @DisplayName("본인의 주문 정보가 아니면 상태 업데이트가 불가능하다.")
+  @Test
+  void updateStatusWithUnauthorizedAccess(){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+    Member member2 = memberRepository.save(createMember("email2@email.com"));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+
+    Order order = orderRepository.save(
+        createOrder(member1, OrderStatus.CREATED, option1.getPrice() + option2.getPrice()));
+    OrderItem orderItem1 = createOrderItem(order, option1, 1);
+    OrderItem orderItem2 = createOrderItem(order, option2, 2);
+    orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
+
+    // when
+    // then
+    assertThatThrownBy(() ->orderService.updateStatus(member2.getId(),
+        order.getId(), OrderStatusRequest.CANCEL)).isInstanceOf(CustomException.class)
+        .hasMessage("해당 정보를 조회할 수 있는 권한이 없습니다");
+  }
+
+  @DisplayName("주문 취소는 배송 출발 전이 아니면 불가능하다.")
+  @CsvSource({"SHIPPING","SHIPPED","COMPLETED","CANCELLED","REQUESTED_RETURN","RETURNED"})
+  @ParameterizedTest
+  void updateStatusCancelWithOrderCancelInvalidState(OrderStatus status){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+    Member member2 = memberRepository.save(createMember("email2@email.com"));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+
+    Order order = orderRepository.save(
+        createOrder(member1, status, option1.getPrice() + option2.getPrice()));
+    OrderItem orderItem1 = createOrderItem(order, option1, 1);
+    OrderItem orderItem2 = createOrderItem(order, option2, 2);
+    orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
+
+    // when
+    // then
+    assertThatThrownBy(() ->orderService.updateStatus(member1.getId(),
+        order.getId(), OrderStatusRequest.CANCEL)).isInstanceOf(CustomException.class)
+        .hasMessage("취소가 가능한 상태가 아닙니다.");
+  }
+
+  @DisplayName("반품 신청은 배송완료 상태가 아니면 불가능하다.")
+  @CsvSource({"CREATED", "SHIPPING","COMPLETED","CANCELLED","REQUESTED_RETURN","RETURNED"})
+  @ParameterizedTest
+  void updateStatusCancelWithOrderReturnInvalidState(OrderStatus status){
+    // given
+    Product product1 = productRepository.save(createProduct("상품1"));
+
+    Member member1 = memberRepository.save(createMember("email1@email.com"));
+    Member member2 = memberRepository.save(createMember("email2@email.com"));
+
+    ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
+    ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
+
+    Order order = orderRepository.save(
+        createOrder(member1, status, option1.getPrice() + option2.getPrice()));
+    OrderItem orderItem1 = createOrderItem(order, option1, 1);
+    OrderItem orderItem2 = createOrderItem(order, option2, 2);
+    orderItemRepository.saveAll(List.of(orderItem1, orderItem2));
+
+    // when
+    // then
+    assertThatThrownBy(() ->orderService.updateStatus(member1.getId(),
+        order.getId(), OrderStatusRequest.REQUESTED_RETURN)).isInstanceOf(CustomException.class)
+        .hasMessage("반품이 가능한 상태가 아닙니다.");
+  }
+
+  private OrderItem createOrderItem(Order order, ProductOption option, int quantity){
+    return OrderItem.builder()
+        .order(order)
+        .price(option.getPrice())
+        .option(option)
+        .quantity(quantity)
+        .build();
+  }
+
+  private Order createOrder(Member member, OrderStatus status, int amountPayment) {
+    return Order.builder()
+        .member(member)
+        .status(status)
+        .amountPayment(amountPayment)
+        .build();
   }
 
   private WishlistItem createWishlistItem(

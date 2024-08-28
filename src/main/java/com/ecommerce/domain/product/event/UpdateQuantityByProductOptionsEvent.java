@@ -1,4 +1,4 @@
-package com.ecommerce.api.service.product.event;
+package com.ecommerce.domain.product.event;
 
 import java.util.Collection;
 

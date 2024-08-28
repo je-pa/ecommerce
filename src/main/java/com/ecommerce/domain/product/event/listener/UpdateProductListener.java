@@ -2,10 +2,10 @@
  * @Date : 2024. 08. 23.
  * @author : jieun(je-pa)
  */
-package com.ecommerce.api.service.product.event.listener;
+package com.ecommerce.domain.product.event.listener;
 
 import com.ecommerce.api.service.product.ProductService;
-import com.ecommerce.api.service.product.event.UpdateQuantityByProductOptionsEvent;
+import com.ecommerce.domain.product.event.UpdateQuantityByProductOptionsEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

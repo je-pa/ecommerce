@@ -1,7 +1,7 @@
 package com.ecommerce.domain.order.entity;
 
-import com.ecommerce.api.service.product.event.UpdateQuantityByProductOptionsEvent.ProductOptionInfo;
 import com.ecommerce.domain.product.entity.ProductOption;
+import com.ecommerce.domain.product.event.UpdateQuantityByProductOptionsEvent.ProductOptionInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

@@ -1,9 +1,11 @@
 package com.ecommerce.api;
 
 import com.ecommerce.api.controller.auth.AuthController;
+import com.ecommerce.api.controller.order.OrderController;
 import com.ecommerce.api.controller.product.ProductController;
 import com.ecommerce.api.controller.wishlist.WishlistController;
 import com.ecommerce.api.service.auth.AuthService;
+import com.ecommerce.api.service.order.OrderService;
 import com.ecommerce.api.service.product.ProductService;
 import com.ecommerce.api.service.wishlist.WishlistService;
 import com.ecommerce.global.security.jwt.util.TokenProvider;
@@ -17,10 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(controllers = {
     AuthController.class,
     ProductController.class,
-    WishlistController.class
+    WishlistController.class,
+    OrderController.class,
 })
 @ActiveProfiles("test")
 public abstract class ControllerTestSupport {
+
   @Autowired
   protected MockMvc mockMvc;
 
@@ -39,4 +43,6 @@ public abstract class ControllerTestSupport {
   @MockBean
   protected WishlistService wishlistService;
 
+  @MockBean
+  protected OrderService orderService;
 }

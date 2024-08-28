@@ -1,6 +1,7 @@
 package com.ecommerce.domain.order.entity;
 
 import com.ecommerce.domain.product.entity.ProductOption;
+import com.ecommerce.domain.product.event.UpdateQuantityByProductOptionsEvent.ProductOptionInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "order_items")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderItem {
+public class OrderItem implements ProductOptionInfo {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,13 +35,22 @@ public class OrderItem {
   @JoinColumn(name = "option_id", nullable = false)
   private ProductOption option;
 
-  @Column(name = "quantity")
+  @Column(name = "quantity", nullable = false)
   private int quantity;
 
+  @Column(name = "price", nullable = false)
+  private int price;
+
   @Builder
-  public OrderItem(ProductOption option, Order order, int quantity) {
+  public OrderItem(ProductOption option, Order order, int quantity, int price) {
     this.option = option;
     this.order = order;
     this.quantity = quantity;
+    this.price = price;
+  }
+
+  @Override
+  public Long getProductOptionId() {
+    return this.option.getId();
   }
 }

@@ -5,6 +5,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import com.ecommerce.domain.BaseEntity;
 import com.ecommerce.domain.product.type.ProductCategory;
 import com.ecommerce.domain.store.entity.Store;
+import com.ecommerce.global.exception.CustomException;
+import com.ecommerce.global.exception.ExceptionCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -63,5 +65,12 @@ public class Product extends BaseEntity {
     this.store = store;
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.price = price;
+  }
+
+  public void setQuantity(int quantity){
+    if(quantity < 0){
+      throw CustomException.from(ExceptionCode.PRODUCT_QUANTITY_NEGATIVE_VALUE_NOT_ALLOWED);
+    }
+    this.stockQuantity = quantity;
   }
 }

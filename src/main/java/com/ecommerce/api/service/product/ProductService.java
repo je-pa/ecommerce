@@ -7,6 +7,7 @@ package com.ecommerce.api.service.product;
 import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest;
 import com.ecommerce.api.controller.product.dto.response.ProductDetailResponse;
 import com.ecommerce.api.controller.product.dto.response.ProductListItemResponse;
+import com.ecommerce.domain.product.event.UpdateQuantityByProductOptionsEvent;
 import org.springframework.data.domain.Slice;
 
 public interface ProductService {
@@ -24,4 +25,10 @@ public interface ProductService {
    * @return 페이징 기반 상품 리스트
    */
   Slice<ProductListItemResponse> getProductSlice(ReadProductListRequest request);
+
+  /**
+   * 상품 및 상품 옵션 재고를 조정합니다.
+   * @param event 상품 옵션id와 조정할 quantity를 리스트로 받습니다.
+   */
+  void adjustQuantity(UpdateQuantityByProductOptionsEvent event);
 }

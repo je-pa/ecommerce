@@ -9,6 +9,7 @@ public enum OrderStatus {
   SHIPPED("배송완료된"),
   COMPLETED("완료된"),
   CANCELLED("취소완료"),
+  REQUESTED_RETURN("반품신청된"),
   RETURNED("반품완료");
 
   private final String name;

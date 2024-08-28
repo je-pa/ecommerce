@@ -20,6 +20,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "orders")
@@ -44,6 +45,7 @@ public class Order extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
+  @Setter
   private OrderStatus status;
 
   @Builder
@@ -51,5 +53,13 @@ public class Order extends BaseEntity {
     this.amountPayment = amountPayment;
     this.member = member;
     this.status = status;
+  }
+
+  public void requestCancel() {
+    this.status = OrderStatus.CANCELLED;
+  }
+
+  public void requestReturn() {
+    this.status = OrderStatus.REQUESTED_RETURN;
   }
 }

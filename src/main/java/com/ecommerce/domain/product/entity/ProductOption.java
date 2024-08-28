@@ -4,6 +4,8 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 import com.ecommerce.domain.BaseEntity;
 import com.ecommerce.domain.product.type.OptionType;
+import com.ecommerce.global.exception.CustomException;
+import com.ecommerce.global.exception.ExceptionCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -54,5 +56,12 @@ public class ProductOption extends BaseEntity {
     this.optionType = optionType;
     this.price = price;
     this.product = product;
+  }
+
+  public void addQuantity(int quantity){
+    if(this.count + quantity < 0){
+      throw CustomException.from(ExceptionCode.OPTION_QUANTITY_NEGATIVE_VALUE_NOT_ALLOWED);
+    }
+    this.count += quantity;
   }
 }

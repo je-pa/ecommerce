@@ -7,6 +7,7 @@ package com.ecommerce.api.service.product;
 import com.ecommerce.api.controller.product.dto.request.ReadProductListRequest;
 import com.ecommerce.api.controller.product.dto.response.ProductDetailResponse;
 import com.ecommerce.api.controller.product.dto.response.ProductListItemResponse;
+import com.ecommerce.api.service.product.event.UpdateQuantityByProductOptionsEvent;
 import org.springframework.data.domain.Slice;
 
 public interface ProductService {
@@ -24,4 +25,6 @@ public interface ProductService {
    * @return 페이징 기반 상품 리스트
    */
   Slice<ProductListItemResponse> getProductSlice(ReadProductListRequest request);
+
+  void adjustQuantity(UpdateQuantityByProductOptionsEvent event);
 }

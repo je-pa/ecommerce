@@ -52,4 +52,12 @@ public class Order extends BaseEntity {
     this.member = member;
     this.status = status;
   }
+
+  public void requestCancel() {
+    this.status = OrderStatus.CANCELLED;
+  }
+
+  public void requestReturn() {
+    this.status = OrderStatus.REQUESTED_RETURN;
+  }
 }

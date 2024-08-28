@@ -1,3 +1,7 @@
+/**
+ * @Date : 2024. 08. 28.
+ * @author : jieun(je-pa)
+ */
 package com.ecommerce.domain.order.repository;
 
 import static com.ecommerce.domain.order.entity.QOrderItem.orderItem;

@@ -1,3 +1,7 @@
+/**
+ * @Date : 2024. 08. 27.
+ * @author : jieun(je-pa)
+ */
 package com.ecommerce.api.service.order;
 
 import static org.assertj.core.api.Assertions.assertThat;

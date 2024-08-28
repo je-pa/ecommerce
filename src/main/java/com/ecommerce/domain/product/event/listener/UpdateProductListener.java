@@ -1,5 +1,5 @@
 /**
- * @Date : 2024. 08. 23.
+ * @Date : 2024. 08. 28.
  * @author : jieun(je-pa)
  */
 package com.ecommerce.domain.product.event.listener;

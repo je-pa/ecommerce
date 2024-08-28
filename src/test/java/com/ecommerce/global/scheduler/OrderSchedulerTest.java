@@ -1,3 +1,7 @@
+/**
+ * @Date : 2024. 08. 28.
+ * @author : jieun(je-pa)
+ */
 package com.ecommerce.global.scheduler;
 
 import com.ecommerce.IntegrationTestSupport;

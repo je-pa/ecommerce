@@ -228,10 +228,8 @@ class OrderServiceTest extends IntegrationTestSupport {
   void updateStatusCancel(){
     // given
     Product product1 = productRepository.save(createProduct("상품1"));
-    Product product2 = productRepository.save(createProduct("상품2"));
 
     Member member1 = memberRepository.save(createMember("email1@email.com"));
-    Member member2 = memberRepository.save(createMember("email2@email.com"));
 
     ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
     ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
@@ -269,14 +267,12 @@ class OrderServiceTest extends IntegrationTestSupport {
   void updateStatusRequestReturn(){
     // given
     Product product1 = productRepository.save(createProduct("상품1"));
-    Product product2 = productRepository.save(createProduct("상품2"));
 
     Member member1 = memberRepository.save(createMember("email1@email.com"));
-    Member member2 = memberRepository.save(createMember("email2@email.com"));
 
     ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
     ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
-    ProductOption option3 = productOptionRepository.save(createProductOption("옵션1-3", product1));
+    productOptionRepository.save(createProductOption("옵션1-3", product1));
 
     Order order = orderRepository.save(
         createOrder(member1, OrderStatus.SHIPPED, option1.getPrice() + option2.getPrice()));
@@ -359,7 +355,6 @@ class OrderServiceTest extends IntegrationTestSupport {
     Product product1 = productRepository.save(createProduct("상품1"));
 
     Member member1 = memberRepository.save(createMember("email1@email.com"));
-    Member member2 = memberRepository.save(createMember("email2@email.com"));
 
     ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
     ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));
@@ -385,7 +380,6 @@ class OrderServiceTest extends IntegrationTestSupport {
     Product product1 = productRepository.save(createProduct("상품1"));
 
     Member member1 = memberRepository.save(createMember("email1@email.com"));
-    Member member2 = memberRepository.save(createMember("email2@email.com"));
 
     ProductOption option1 = productOptionRepository.save(createProductOption("옵션1-1", product1));
     ProductOption option2 = productOptionRepository.save(createProductOption("옵션1-2", product1));

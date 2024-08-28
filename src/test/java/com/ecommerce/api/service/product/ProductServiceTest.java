@@ -205,10 +205,6 @@ class ProductServiceTest extends IntegrationTestSupport {
 
     ProductOption option1 = productOptionRepository.save(
         createProductOption("옵션1-1", option1Quantity, product1));
-    ProductOption option2 = productOptionRepository.save(
-        createProductOption("옵션1-2", option2Quantity, product1));
-    ProductOption option3 = productOptionRepository.save(
-        createProductOption("옵션1-3", option3Quantity, product1));
 
     // when
     // then
@@ -237,8 +233,6 @@ class ProductServiceTest extends IntegrationTestSupport {
         createProductOption("옵션1-1", option1Quantity, product1));
     ProductOption option2 = productOptionRepository.save(
         createProductOption("옵션1-2", option2Quantity, product1));
-    ProductOption option3 = productOptionRepository.save(
-        createProductOption("옵션1-3", option3Quantity, product1));
 
     // when
     // then

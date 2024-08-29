@@ -78,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
         () -> CustomException.from(ExceptionCode.ORDER_NOT_FOUND)
     );
 
-    if(currentMemberId != order.getMember().getId()){
+    if(!currentMemberId.equals(order.getMember().getId())){
       throw CustomException.from(ExceptionCode.UNAUTHORIZED_ACCESS);
     }
 

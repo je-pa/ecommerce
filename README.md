@@ -291,20 +291,20 @@
 
 > 📌 Resilience4j
 > 
-> 외부 API 호출 시 발생할 수 있는 장애로부터 시스템을 보호하기 위해 **Resilience4j**를 도입하였습니다. 
+> Resilience4j를 통해 외부 API 호출 시 발생할 수 있는 장애로부터 시스템을 보호하는 기능을 구현하였습니다. 
 > 
-> Resilience4j는 외부 서비스의 장애가 우리의 API 서버에 미치는 영향을 최소화하는데 도움을 주며, 이를 통해 시스템의 회복 탄력성을 강화할 수 있었습니다.
+> 외부 서비스의 장애가 시스템에 미치는 영향을 최소화하여 회복 탄력성을 강화할 수 있도록 도와줍니다.
 >
 > 
 > <details>
 > <summary>Resilience4j 도입 배경</summary>
 > 
-> Resilience4j를 사용하여 Circuit Breaker와 Retry 패턴을 적용함으로써 외부 API 호출의 안정성을 보장하고,
-> 시스템 리소스를 보호하기 위한 회복 탄력성을 강화했습니다.
+> 프로젝트가 기존의 단일 애플리케이션 아키텍처(Monolithic Architecture, MA)에서 마이크로서비스 아키텍처(Microservices Architecture, MSA)로 변경되었습니다. 
 > 
-> - Feign Client에 Circuit Breaker 및 Retry 적용
->   - Circuit Breaker: 서비스가 불안정할 때 자동으로 요청을 차단하여 시스템 과부하를 방지하고, 잠시 후 다시 시도할 수 있는 상태로 전환합니다.
->   - Retry: 서비스가 일시적으로 사용 불가능한 경우(예: 네트워크 문제, 서버 다운 등) 일정 횟수까지 재시도를 수행하여 일시적인 오류를 해결합니다.
+> 이 과정에서 Feign Client를 사용하여 다른 마이크로서비스와 통신하는 부분이 추가되었습니다. 이에 따라 외부 API 호출 시 발생할 수 있는 장애로부터 시스템을 보호하고, 각 마이크로서비스 간의 안정적인 통신을 보장하기 위해 Resilience4j를 도입하였습니다.
+>
+> - Circuit Breaker: 외부 서비스가 불안정할 때 자동으로 요청을 차단하여 시스템 과부하를 방지하고, 잠시 후 다시 시도할 수 있는 상태로 전환합니다.
+> - Retry: 외부 서비스가 일시적으로 사용 불가능한 경우(예: 네트워크 문제, 서버 다운 등) 일정 횟수까지 재시도를 수행하여 일시적인 오류를 해결합니다.
 > </details>
 
 <details>
@@ -314,13 +314,13 @@
 ```yaml
 resilience4j:
   retry:
-    retry-aspect-order: 2 # 우선 순위 - 값이 높을수록 우선순위가 높아짐
+    retry-aspect-order: 2 
     configs:
       default:
-        max-attempts: 2 # 재시도 횟수
-        wait-duration: 500 # 재시도 간격(총시간 = (재시도횟수 -1) * 재시도 간격 + 첫 시도 시간)
+        max-attempts: 2 
+        wait-duration: 500 
         retry-exceptions:
-          - feign.FeignException.ServiceUnavailable  # 서버가 일시적으로 사용 불가능한 상태일 때 발생하는 예외
+          - feign.FeignException.ServiceUnavailable  
         ignore-exceptions:
           - feign.FeignException.BadGateway
           - feign.FeignException.NotImplemented
@@ -329,107 +329,48 @@ resilience4j:
       simpleRetryConfig:
         baseConfig: default
 ```
-- 최대 재시도 횟수(`max-attempts`)
-
-  : 선착순 구매 시스템에서는 너무 많은 재시도가 오히려 시스템에 부담을 줄 수 있습니다. 따라서 재시도 횟수를 2-3회 정도로 낮게 설정하는 것이 적절합니다.
-
-- 재시도 간격(`wait-duration`)
-
-  : 짧은 wait-duration (예: 100-500ms)을 설정해 재시도를 빠르게 하지만, 너무 빈번한 시도는 피하는 것이 중요합니다. 재시도를 빠르게 하되 시스템에 무리를 주지 않도록 조정합니다.
-
-- 처리할 예외
-
-  - `feign.FeignException.ServiceUnavailable`
-  : 서버가 일시적으로 사용 불가능할 때 발생하며, 재시도를 통해 해결 가능성이 있음.
-
-- 무시할 예외
-
-  - `feign.FeignException.BadGateway`
-  : 재시도를 해도 즉각적으로 문제가 해결될 가능성이 낮아 게이트웨이 문제는 빠른 해결이 어렵거나 장기적인 문제일 수 있으므로, 재시도하지 않고 무시하는 것이 좋음
-
-  - `feign.FeignException.NotImplemented`
-  : 서버 측에서 해당 기능이 구현되어 있지 않거나 미지원인 상태이므로 재시도를 해도 성공할 가능성이 전혀 없기 때문에 재시도할 필요가 없음
-
-  - `feign.FeignException.FeignClientException`
-  : 잘못된 파라미터나 비정상적인 요청 형식 때문에 발생하기 때문에 재시도를 해도 클라이언트 측의 요청이 잘못된 경우에는 성공할 가능성이 없으므로, 이를 무시하고 재시도하지 않음
-
+- 설정 설명
+  - 최대 재시도 횟수: 2회로 설정. 선착순 구매 시스템의 특성상 지나치게 많은 재시도가 시스템에 부담을 줄 수 있어 제한
+  - 재시도 간격: 500ms로 설정. 너무 긴 대기 시간이 아니라 빠른 재시도를 통해 오류 해결 시도
+  - 재시도할 예외: 서버가 일시적으로 사용 불가능한 경우(ServiceUnavailable)에만 재시도
+  - 무시할 예외: 게이트웨이 오류나 클라이언트 오류 등은 재시도가 의미 없으므로 무시
 #### 서킷 브레이커 설정
 ```yaml
 resilience4j:
   circuitbreaker:
     circuit-breaker-aspect-order: 1
     configs:
-      default: # 설정 set (아래는 메서드들)
+      default:
         sliding-window-type: COUNT_BASED
-        minimum-number-of-calls: 7 # 최소 7번까지는 무조건 CLOSE로 가정하고 호출 (실제 메서드 호출은 리트라이 횟수를 곱해야함)
-        sliding-window-size: 10 # (minimumNumberOfCalls 이후로는) 10개의 요청을 기준으로 판단
-        wait-duration-in-open-state: 10s # OPEN 상태에서 HALF_OPEN으로 기다릴 시간
-
-        failure-rate-threshold: 50 # slidingWindowSize 중 몇 %가 recordException이면 OPEN으로 만들 것인지
-
-        slow-call-duration-threshold: 3000 # 몇 ms 동안 요청이 처리되지 않으면 실패로 간주
-        slow-call-rate-threshold: 60 # slidingWindowSize 중 몇 %가 slowCall이면 OPEN으로 만들 것인가?
-
-        permitted-number-of-calls-in-half-open-state: 5 # half open 상태에서 다른 상태로 전환하기 위한 판단 수(HALF_OPEN 상태에서 5번까지는 CLOSE로 가기위해 호출한다.)
-        automatic-transition-from-open-to-half-open-enabled: true # OPEN 상태에서 자동으로 HALF_OPEN으로 갈 것인가?
-
+        minimum-number-of-calls: 7
+        sliding-window-size: 10
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50  
+        slow-call-duration-threshold: 3000ms  
+        slow-call-rate-threshold: 60  
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
         record-exceptions:
-          - feign.FeignException.ServiceUnavailable # 서버가 일시적으로 사용 불가능한 상태일 때 발생하는 예외
-          - feign.FeignException.GatewayTimeout # 서버가 게이트웨이로부터 응답을 기다리는 동안 시간이 초과된 경우 발생하는 예외
+          - feign.FeignException.ServiceUnavailable
+          - feign.FeignException.GatewayTimeout
           - java.net.SocketTimeoutException
-          - feign.FeignException.BadGateway # 다른 서버(게이트웨이)를 통해 잘못된 응답을 받았을 때 발생
+          - feign.FeignException.BadGateway
         ignore-exceptions:
-          - feign.FeignException.NotImplemented # 클라이언트의 요청을 처리할 방법을 지원하지 않는 경우 발생하는 예외
+          - feign.FeignException.NotImplemented
           - feign.FeignException.FeignClientException
     instances:
       simpleCircuitBreakerConfig:
         baseConfig: default
+
 ```
-- 슬라이딩 윈도우 유형(`sliding-window-type`)
-
-  : `COUNT_BASED` 선택. 선착순 시스템은 많은 요청이 들어오기 때문에 호출 수 기반으로 빠르게 상태를 결정할 수 있습니다.
-
-- 슬라이딩 윈도우 크기(`sliding-window-size`)
-
-  : 작은 sliding-window-size로 설정하여 적은 호출 수로도 상태를 빠르게 판단할 수 있습니다.
-
-- 최소 호출 수(`minimum-number-of-calls`)
-
-  : 5-10 정도로 설정하여 실패율에 빠르게 반응할 수 있도록 합니다. 이를 통해 급격한 트래픽 증가 시 빠르게 대응할 수 있습니다.
-
-  - 설정하지 않으면 서버가 처음 시작된 직후 1~2번의 실패만으로도 서킷 브레이커가 너무 빠르게 열리는 상황이 발생할 수 있습니다.
-
-- 실패율 임계값(`failure-rate-threshold`)
-
-  : 비교적 낮은 임계값(40-50%)을 설정하여 일정 비율 이상의 호출이 실패할 경우 서킷 브레이커가 빠르게 열리도록 설정합니다. 
-  
-  - 선착순 구매 시스템에서는 문제가 발생했을 때 즉각적으로 대응해야 하기 때문에 낮은 임계값이 적합합니다.
-
-- 반 개방 상태에서 허용할 호출 수 (`permitted-number-of-calls-in-half-open-state`)
-
-  : 5-10회 정도로 설정하여 OPEN 상태에서 HALF_OPEN 상태로 전환될 때 천천히 트래픽을 재도입하고, 문제가 해결되었는지 확인할 수 있도록 합니다.
-
-- 처리할 예외()
-
-  - `feign.FeignException.ServiceUnavailable`
-  : 서버의 서비스가 일시적으로 중단된 경우, 해당 예외는 시스템이 해당 서버에 대한 호출을 중단하고 다른 대체 동작을 시도하도록 유도하여 서킷브레이커로 감지하여 대기 시간을 줄이고 시스템의 리소스를 보호
-
-  - `feign.FeignException.GatewayTimeout`
-  : 서킷브레이커를 통해 더 이상의 시도를 막고, 일시적인 문제일 가능성이 있으므로 재시도 또는 대체 경로를 사용할 수 있도록 함
-
-  - `java.net.SocketTimeoutException`
-  : 소켓 연결 시 타임아웃은 일반적으로 네트워크 불안정성이나 서버 부하로 인해 발생하는 상황에서 서킷브레이커는 재시도나 대체 처리를 통해 시스템의 안정성을 유지
-
-  - `feign.FeignException.BadGateway`
-  : 502 Bad Gateway 오류가 자주 발생하거나, 오래 지속되는 경우에는 단순 재시도로는 해결되지 않는 문제가 있을 수 있기 때문에, 서킷브레이커를 작동시켜 해당 서비스로의 요청을 일시적으로 차단하는 것이 유리
-
-- 무시할 예외
-
-  - `feign.FeignException.NotImplemented`
-  : 서버에서 기능을 지원하지 않음을 명확하게 알린 경우이므로, 이 예외는 재시도해도 의미가 없고 다른 방법으로 요청을 처리해야 할 상황이므로 서킷브레이커를 적용할 필요가 없음
-
-  - `feign.FeignException.FeignClientException`
-  : 클라이언트 측의 오류로 인해 발생하는 예외이기 때문에 재시도해도 성공할 가능성이 없음. 클라이언트에서 요청을 수정해야 하는 문제이므로 서킷브레이커를 적용할 필요가 없음
+- 설정 설명: 
+  * 슬라이딩 윈도우 유형: 요청 수 기반(COUNT_BASED)으로 빠르게 상태 판단
+  * 최소 호출 수: 7회로 설정, 실패율 판단을 위해 최소 호출 수를 설정하여 안정성 확보
+  * 실패율 임계값: 50%로 설정, 절반 이상의 요청이 실패하면 서킷이 열림
+  * 느린 호출 임계값: 3초 이상 걸리는 호출을 실패로 간주
+  * 반 개방 상태에서 허용할 호출 수: 5회, 시스템이 반 개방 상태에서 천천히 트래픽을 다시 받아들일 수 있도록 설정
+  * 처리할 예외: 일시적인 서버 오류나 게이트웨이 문제를 처리
+  * 무시할 예외: 클라이언트 측 오류는 서킷 브레이커를 무시
 </details>
 
 ### ☁️ MSA 환경 구축

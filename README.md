@@ -102,26 +102,25 @@
     <td></td>
   </tr>
   <tr>
-    <td rowspan="3">클라우드</td>
+    <td rowspan="5">스프링 클라우드</td>
     <td><img src="https://img.shields.io/badge/Spring_Cloud 2023.0.3-6DB33F?style=flat&logo=Spring&logoColor=white" alt="Spring Cloud" /></td>
     <td></td>
   </tr>
   <tr>
     <td><img src="https://img.shields.io/badge/Spring_Cloud_Config-6DB33F?style=flat&logo=Spring&logoColor=white" alt="Spring Cloud Config" /></td>
-    <td></td>
+    <td>config value Serving</td>
   </tr>
   <tr>
     <td><img src="https://img.shields.io/badge/Spring_Cloud_Gateway-6DB33F?style=flat&logo=Spring&logoColor=white" alt="Spring Cloud Gateway" /></td>
-    <td></td>
+    <td>endpoint 단일화</td>
   </tr>
   <tr>
-    <td rowspan="2">서비스 디스커버리</td>
-    <td><img src="https://img.shields.io/badge/Eureka-4285F4?style=flat&logoColor=white" alt="Eureka" /></td>
-    <td></td>
+    <td><img src="https://img.shields.io/badge/Spring_Cloud_Eureka_Server-6DB33F?style=flat&logo=Spring&logoColor=white" alt="Eureka" /></td>
+    <td>Discovery</td>
   </tr>
   <tr>
-    <td><img src="https://img.shields.io/badge/Eureka_Client-4285F4?style=flat&logoColor=white" alt="Eureka Client" /></td>
-    <td></td>
+    <td><img src="https://img.shields.io/badge/Spring_Cloud_Eureka_Client-6DB33F?style=flat&logo=Spring&logoColor=white" alt="Eureka Client" /></td>
+    <td>Registry</td>
   </tr>
 </table>
 
@@ -513,7 +512,7 @@ resilience4j:
 
 > #### 📌 Eureka Server
 >
-> Eureka는 Netflix에서 개발한 서비스 등록 및 디스커버리(발견) 도구로, MSA 환경에서 서비스 간 통신을 돕기 위해 각 서비스의 정보를 관리합니다. Eureka Server는 마이크로서비스들을 등록하고, 서로의 위치를 찾아주는 역할을 합니다.
+> Eureka는 Netflix에서 개발한 서비스 등록 및 디스커버리 도구로, MSA 환경에서 서비스 간 통신을 돕기 위해 각 서비스의 정보를 관리합니다. Eureka Server는 마이크로서비스들을 등록하고, 서로의 위치를 찾아주는 역할을 합니다.
 
 > #### 📌 도입 배경
 >
@@ -550,13 +549,28 @@ resilience4j:
 
 본 프로젝트는 자동화된 테스트를 사용하여 안정성을 보장합니다.
 
-> #### 커버리지 및 품질 결과
+>  #### 📌 사용 도구
 >
-> - **JaCoCo 보고서**:
->   - 테스트 커버리지는 전체 코드베이스의 92.7%에 달하며, 이를 통해 주요 비즈니스 로직이 충분히 검증되었음을 확인했습니다.
-> - **SonarQube 분석 결과**:
->   - SonarQube에서 보안, 신뢰성, 유지보수성 측면에서 모두 A 등급을 받았으며, 코드 품질에 대한 높은 기준을 유지하고 있습니다.
->   - 중복 코드 비율은 0.0%이며, 보안 취약점 및 핫스팟도 발견되지 않았습니다.
+>  - **JUnit5**:
+>    - 프로젝트의 주요 테스트 프레임워크로 사용되었으며, 각 계층의 테스트 케이스를 작성하고 실행하는 데 사용되었습니다.
+>
+>  - **Mockito**:
+>    - Controller 단위 테스트에서 의존성 주입을 Mocking하여 외부 종속성과의 결합을 줄이고, 독립적으로 메서드를 테스트하기 위해 사용되었습니다.
+>
+>  - **JaCoCo**:
+>    - 코드 커버리지 분석 도구로, 테스트 케이스가 전체 코드베이스에서 얼마나 많은 부분을 커버하고 있는지 확인하기 위해 사용했습니다. 현재 프로젝트의 커버리지는 92.7%입니다.
+>
+>  - **SonarQube**:
+>    - 코드 품질 분석 도구로, 코드 내의 잠재적인 버그, 보안 문제, 중복 코드, 유지보수성 등을 검토하고, 코드 품질을 지속적으로 개선하기 위해 사용했습니다.
+
+
+#### 커버리지 및 품질 결과
+
+- **JaCoCo 보고서**:
+  - 테스트 커버리지는 전체 코드베이스의 92.7%에 달하며, 이를 통해 주요 비즈니스 로직이 충분히 검증되었음을 확인했습니다.
+- **SonarQube 분석 결과**:
+  - SonarQube에서 보안, 신뢰성, 유지보수성 측면에서 모두 A 등급을 받았으며, 코드 품질에 대한 높은 기준을 유지하고 있습니다.
+  - 중복 코드 비율은 0.0%이며, 보안 취약점 및 핫스팟도 발견되지 않았습니다.
 
 
 <details>
@@ -570,22 +584,7 @@ resilience4j:
 
 </details>
 
-<details>
-  <summary>사용 도구</summary>
 
-  - **JUnit5**:
-    - 프로젝트의 주요 테스트 프레임워크로 사용되었으며, 각 계층의 테스트 케이스를 작성하고 실행하는 데 사용되었습니다.
-
-  - **Mockito**:
-    - Controller 단위 테스트에서 의존성 주입을 Mocking하여 외부 종속성과의 결합을 줄이고, 독립적으로 메서드를 테스트하기 위해 사용되었습니다.
-
-  - **JaCoCo**:
-    - 코드 커버리지 분석 도구로, 테스트 케이스가 전체 코드베이스에서 얼마나 많은 부분을 커버하고 있는지 확인하기 위해 사용했습니다. 현재 프로젝트의 커버리지는 92.7%입니다.
-
-  - **SonarQube**:
-    - 코드 품질 분석 도구로, 코드 내의 잠재적인 버그, 보안 문제, 중복 코드, 유지보수성 등을 검토하고, 코드 품질을 지속적으로 개선하기 위해 사용했습니다.
-
-</details>
 
 
 ### 🙆🏻‍♀️ 유저 서비스
